@@ -515,19 +515,44 @@ We can also use the SILVA species assignment dataset to do exactly that, that is
 
 # Assign species
 
-taxa <- addSpecies(seqtab.nochim, "~/Documents/NRSG_741/MiSeqData/MiSeq_SOP/silva_species_assignment_v132.fa.gz")
+taxa <- addSpecies(taxa, "~/Documents/NRSG_741/MiSeqData/MiSeq_SOP/silva_species_assignment_v132.fa.gz")
+
 
 ```
 
-Let's inspect the taxonomic assignments:
+Inspect the taxonomic assignments:
 
 ```{r}
 
-taxa.print <- taxa "Removing sequence rownames for display only"
+taxa.print <- taxa #Removing sequence rownames for display only
 rownames (taxa.print) <- NULL
 head(taxa.print)
 
 ```
+
+
+### Evaluate Accuracy
+
+
+In addition to the MiSeq_SOP files, we have also analyzed a "mock community", a mixture of 20 known strains. Reference sequences were provided in the downloaded zip archive. Let's see how the sequences inferred by DADA2 compare to the expected composition of the community.
+
+```{r}
+
+# Evaluate DADA2's accuracy on the mock community
+
+unqs.mock <- seqtab.nochim["Mock",]
+unqs.mock <- sort(unqs.mock[unqs.mock>0], decreasing=TRUE) #Drop ASVs absent in the Mock Community
+cat("DADA2 inferred", length(unqs.mock), "sample sequences present in the Mock Community. \n")
+
+mock.ref <- getSequences(file.path(path, "HMP_MOCK.v35.fasta"))
+match.ref <- sum(sapply(names(unqs.mock), function(x)any(grepl(x, mock.ref))))
+cat("Of those,", sum(match.ref), "were exact matches to the expected reference sequences. \n")
+
+```
+
+
+
+
 
 
 
@@ -640,7 +665,8 @@ library(phyloseq)
 # Create phyloseq object
 ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
                sample_data(samdf),
-               tax_table(taxa))
+               tax_table(taxa),
+               phy_tree(fitGTR$tree))
 
 # Describe it
 ps
