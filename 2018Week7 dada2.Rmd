@@ -492,7 +492,9 @@ Most people want to know the names of the organisms associated with the sequence
 
 There are many training sets to use. GreenGenes is one such set, but it has not been updated in 3 years. UNITED ITS and the Ribosomal Database Project (RDP) are others, the former being used for fungi. We are going to use a training set from SILVA. You should have downloaded that earlier and it should be sitting in the same folder as the original forward and reverse read files.
 
-```{r}
+```{r}  
+
+
 
 # Assign taxonomy
 
